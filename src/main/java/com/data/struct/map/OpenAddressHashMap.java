@@ -59,7 +59,7 @@ public class OpenAddressHashMap implements OpenAddressMap {
 	@Override
 	public long get(int key) {
 		int hashCode = hashCode(key);
-		if(checkSize()) {
+		if(table.length >= hashCode) {
 			if(table[hashCode] == null) {
 				throw new NoSuchElementException("No element with such key " + key);
 			}
@@ -71,29 +71,35 @@ public class OpenAddressHashMap implements OpenAddressMap {
 					return table[hashCode].getValue();
 				}
 			}
+		} else {
+			throw new NoSuchElementException("No element with such key " + key);
 		}
 		return 0;
 	}
 
 	@Override
-	public long remove(int key) {
+	public boolean remove(int key) {
 		int hashCode = hashCode(key);
-		if(table[hashCode] == null) {
+		if(table.length >= hashCode) {
+			if(table[hashCode] == null) {
+				throw new NoSuchElementException("No element with such key " + key);
+			}
+			if(table[hashCode].getKey() == key) {
+				table[hashCode] = null;
+				size--;
+				return true;
+			}
+			for(int i = hashCode + 1; i != hashCode; i = (i + 1) % table.length) {
+				if(table[i].getValue() == key) {
+					table[i] = null;
+					size--;
+					return true;
+				}
+			}
+		} else {
 			throw new NoSuchElementException("No element with such key " + key);
 		}
-		if(table[hashCode].getKey() == key) {
-			table[hashCode] = null;
-			size--;
-			return key;
-		}
-		for(int i = hashCode + 1; i != hashCode; i = (i + 1) % table.length) {
-			if(table[i].getValue() == key) {
-				table[i] = null;
-				size--;
-				return key;
-			}
-		}
-		return 0;
+		return false;
 	}
 
 	@Override

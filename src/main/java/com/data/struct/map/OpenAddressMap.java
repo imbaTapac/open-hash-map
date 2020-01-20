@@ -5,7 +5,7 @@ public interface OpenAddressMap {
 
 	long get(int key);
 
-	long remove(int key);
+	boolean remove(int key);
 
 	int size();
 
